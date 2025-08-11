@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Note</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      form input,
+      form textarea,
+      form select {
+        margin: 5px 0;
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+      button {
+        margin-top: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <form method="post" action="{% url 'edit_note' note.id %}">
+      <h2>Edit Note</h2>
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Save Changes</button>
+    </form>
+  </body>
+</html>

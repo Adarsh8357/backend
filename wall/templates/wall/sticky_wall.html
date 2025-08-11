@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sticky Wall</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h1 {
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        margin: 30px 0 10px;
+      }
+
+      /* Hidden form initially */
+      #addNoteForm {
+        display: none;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      #addNoteForm input,
+      #addNoteForm select,
+      #addNoteForm textarea {
+        margin: 5px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 200px;
+      }
+
+      #addNoteForm button {
+        margin-top: 8px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      /* Floating + button */
+      #showFormBtn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 32px;
+        color: white;
+        background-color: #4caf50;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Notes grid */
+      .notes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 10px;
+      }
+
+      .note {
+        border-radius: 10px;
+        padding: 10px 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+      }
+
+      .note h3 {
+        margin-top: 0;
+        font-size: 1.1em;
+      }
+
+      .yellow {
+        background-color: #fff59d;
+      }
+      .blue {
+        background-color: #81d4fa;
+      }
+      .pink {
+        background-color: #f8bbd0;
+      }
+      .orange {
+        background-color: #ffcc80;
+      }
+
+      .note button {
+        margin-top: 5px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+
+      .note button.delete-btn {
+        background-color: #e53935;
+      }
+
+      .note .completed-text {
+        color: green;
+        font-weight: bold;
+      }
+
+      .deleted {
+        opacity: 0.5;
+        text-decoration: line-through;
+      }
+      .edit-btn {
+    background-color: #ff9800; /* orange color */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+    </style>
+  </head>
+  <body>
+    <h1>Sticky Wall</h1>
+
+    <!-- Hidden form (centered) -->
+    <form id="addNoteForm" method="POST">
+      {% csrf_token %} {{ form.title }} {{ form.content }} {{ form.color }}
+      <br />
+      <button type="submit">Add Note</button>
+    </form>
+
+    <!-- Floating + button -->
+    <button id="showFormBtn">+</button>
+
+    <h2>Completed Notes</h2>
+    <div class="notes">
+      {% for note in notes %}
+      <div class="note {{ note.color }}">
+        <h3>{{ note.title }}</h3>
+        <p>{{ note.content }}</p>
+        <p><strong>Priority:</strong> {{ note.priority|title }}</p>
+        {% if note.due_date %}
+        <p><strong>Due:</strong> {{ note.due_date }}</p>
+        {% endif %}
+        <p style="font-size: 0.8em; color: #555">
+          Created: {{ note.created_at|date:"Y-m-d" }}
+        </p>
+        {% if not note.completed %}
+        <a href="{% url 'complete_note' note.id %}">
+          <button>Complete</button>
+        </a>
+        {% else %}
+        <p class="completed-text">✅ Completed</p>
+        {% endif %}
+        <a href="{% url 'delete_note' note.id %}">
+          <button class="delete-btn">Delete</button>
+        </a>
+        <a href="{% url 'edit_note' note.id %}">
+    <button class="edit-btn">Edit</button>
+</a>
+      </div>
+
+      {% endfor %}
+    </div>
+
+    <h2>Deleted Notes</h2>
+    <div class="notes">
+      {% for note in deleted_notes %}
+      <div class="note {{ note.color }} deleted">
+        <h3>{{ note.title }}</h3>
+        <p>{{ note.content }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <script>
+      const showFormBtn = document.getElementById("showFormBtn");
+      const addNoteForm = document.getElementById("addNoteForm");
+
+      showFormBtn.addEventListener("click", function () {
+        if (
+          addNoteForm.style.display === "none" ||
+          addNoteForm.style.display === ""
+        ) {
+          addNoteForm.style.display = "block";
+          showFormBtn.textContent = "×"; // Change + to ×
+        } else {
+          addNoteForm.style.display = "none";
+          showFormBtn.textContent = "+";
+        }
+      });
+    </script>
+  </body>
+</html>
